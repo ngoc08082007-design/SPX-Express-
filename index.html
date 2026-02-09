@@ -178,9 +178,9 @@ font-size:13px;z-index:9999
 </div>
 
 <div class="status-box">
-<div id="result-text" class="status-text">Sẵn sàng...</div>
+<div id="result-text" class="status-text">Sẵn sàng quét...</div>
 <div id="result-hint" class="status-hint">
-Hỗ trợ SPXVN & VN (có/không ký tự cuối)
+Hỗ trợ các đơn SPXVN & VN 
 </div>
 </div>
 
@@ -249,41 +249,56 @@ if(v)processCode(v);
 }
 
 function processCode(text){
-playSound("sound-start");
+    playSound("sound-start");
 
-/* LUÔN ĐIỀN VÀO KHUNG DÙ ĐÚNG HAY SAI */
-document.getElementById("manual-code").value=text;
-document.getElementById("copy-btn").disabled=!text;
+    /* LUÔN ĐIỀN VÀO KHUNG DÙ ĐÚNG HAY SAI */
+    document.getElementById("manual-code").value = text;
+    document.getElementById("copy-btn").disabled = !text;
 
-/* ✅ REGEX CHUẨN THỰC TẾ KHO */
-const local=/^SPXVN\d{12}[A-Z]?$/;
-const intl=/^VN\d{13}[A-Z]?$/;
-const ok=local.test(text)||intl.test(text);
+    /* ✅ REGEX CHUẨN THỰC TẾ KHO */
+    const local = /^SPXVN\d{12}[A-Z]?$/;
+    const intl = /^VN\d{13}[A-Z]?$/;
+    const ok = local.test(text) || intl.test(text);
 
-setTimeout(()=>{
-if(ok){
-playSound("sound-success");
-scan-frame.className="scan-frame valid";
-result-text.textContent=text;
-result-text.style.color="var(--success)";
-result-hint.textContent=
-local.test(text) ? "ĐƠN TRONG NƯỚC" : "ĐƠN QUỐC TẾ (INBOUND)";
-result-hint.style.color="var(--success)";
-spx-link-btn.href=`https://spx.vn/track?${text}`;
-spx-link-btn.style.display="block";
-addLog(text,true);
-}else{
-playSound("sound-error");
-scan-frame.className="scan-frame invalid";
-result-text.textContent=text;
-result-text.style.color="var(--error)";
-result-hint.textContent="VUI LÒNG NHẬP ĐÚNG MÃ VẬN ĐƠN!";
-result-hint.style.color="var(--error)";
-spx-link-btn.style.display="none";
-addLog(text,false);
-}
-setTimeout(()=>scan-frame.className="scan-frame",500);
-},300);
+    // Lấy các phần tử DOM (Đã sửa lỗi gạch ngang)
+    const scanFrame = document.getElementById("scan-frame");
+    const resultText = document.getElementById("result-text");
+    const resultHint = document.getElementById("result-hint");
+    const spxLinkBtn = document.getElementById("spx-link-btn");
+
+    setTimeout(() => {
+        if(ok){
+            playSound("sound-success");
+            
+            // Sửa lỗi cú pháp ở đây:
+            scanFrame.className = "scan-frame valid";
+            resultText.textContent = text;
+            resultText.style.color = "var(--success)";
+            
+            resultHint.textContent = local.test(text) ? "ĐƠN TRONG NƯỚC" : "ĐƠN QUỐC TẾ (INBOUND)";
+            resultHint.style.color = "var(--success)";
+            
+            spxLinkBtn.href = `https://spx.vn/track?${text}`;
+            spxLinkBtn.style.display = "block";
+            
+            addLog(text, true);
+        } else {
+            playSound("sound-error");
+            
+            // Sửa lỗi cú pháp ở đây:
+            scanFrame.className = "scan-frame invalid";
+            resultText.textContent = text;
+            resultText.style.color = "var(--error)";
+            
+            resultHint.textContent = "VUI LÒNG NHẬP ĐÚNG MÃ VẬN ĐƠN!";
+            resultHint.style.color = "var(--error)";
+            
+            spxLinkBtn.style.display = "none";
+            addLog(text, false);
+        }
+        
+        setTimeout(() => scanFrame.className = "scan-frame", 500);
+    }, 300);
 }
 
 function addLog(t,ok){
